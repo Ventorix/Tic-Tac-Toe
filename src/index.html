@@ -22,8 +22,8 @@
     <main class="main container">
       <div class="options">
         <div class="marker-type">
-          <button class="btn type-btn first-type active-type">X</button>
-          <button class="btn type-btn second-type">O</button>
+          <button class="btn first-type active-type">X</button>
+          <button class="btn second-type">O</button>
         </div>
         <div class="range-block">
           <div class="grid-size">3 x 3</div>
@@ -32,6 +32,33 @@
       </div>
         <div class="game-grid">
         </div>
+
+        <div class="results">
+          <div class="results-block">
+              <p class="results-block__name">Player X</p>
+              <h2 class="results-block__score" id="xScore">0</h2>
+          </div>
+          <div class="results-block">
+              <p class="results-block__name">Ties</p>
+              <h2 class="results-block__score" id="tieScore">0</h2>
+          </div>
+          <div class="results-block">
+              <p class="results-block__name">Player O</p>
+              <h2 class="results-block__score" id="oScore">0</h2>
+          </div>
+      </div>
+
+        <div class="result-modal hide">
+          <div class="result-modal__title">Well played!</div>
+          <h2 class="result-modal__brief"><span id="winner"  class="result-modal__winner"></span> TAKES THE ROUND</h2>
+          <div class="result-modal__buttons">
+            <button class="result-modal__reset-btn btn">MENU</button>
+            <button class="result-modal__continue-btn btn">NEXT ROUND</button>
+          </div>
+        </div>
+
+        
+        <div class="overlay hide"></div>
     </main>
 
     <footer class="footer">
