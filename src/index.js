@@ -8,9 +8,11 @@ let currentSize = DEFAULT_SIZE;
 let currentType = DEFAULT_TYPE;
 
 const GameBoard = (() => {
-  const board = new Array(currentSize ** 2);
+  let board = new Array(currentSize ** 2);
 
   const getBoard = () => board;
+
+  const setSize = () => (board = new Array(currentSize ** 2));
 
   const getCell = (index) => board[index];
 
@@ -21,15 +23,15 @@ const GameBoard = (() => {
       board[i] = '';
     }
   };
-  return { getBoard, getCell, setCell, resetCells };
+  return { getBoard, setSize, getCell, setCell, resetCells };
 })();
 
 const ScreenController = (() => {
   const markerType = document.querySelectorAll('.type-btn');
-  const firstType = document.querySelector('.first-type');
-  const secondType = document.querySelector('.second-type');
-  const sizeValue = document.querySelector('.grid-size');
-  const sizeSlider = document.querySelector('.range-slider');
+  const playerModeButton = document.querySelector('.game-init__game-mode__player-vs-player');
+  const aiModeButton = document.querySelector('.game-init__game-mode__player-vs-ai');
+  const gridSizeValue = document.querySelector('.game-init__grid-size');
+  const gridSizeSlider = document.querySelector('.game-init__range-slider');
   const gameGrid = document.querySelector('.game-grid');
   const overlay = document.querySelector('.overlay');
   const resultModal = document.querySelector('.result-modal');
@@ -37,9 +39,18 @@ const ScreenController = (() => {
   const playerXScore = document.getElementById('xScore');
   const playerOScore = document.getElementById('oScore');
   const tieScore = document.getElementById('tieScore');
+  const turnMark = document.getElementById('turnMark');
+  const startBtn = document.querySelector('.game-init__start-btn');
+  const gameScreen = document.querySelector('.main');
+  const gameScreenHeader = document.querySelector('.header');
+  const gameInitScreen = document.querySelector('.game-init');
+  const menuBtn = document.querySelector('.result-modal__menu-btn');
+  const roundWinner = document.getElementById('winner');
 
-  continueButton.addEventListener('click', setupGrid().reloadGrid);
-  sizeSlider.addEventListener('input', (e) => changeSize(e.target.value));
+  menuBtn.addEventListener('click', disableGameboard);
+  startBtn.addEventListener('click', enableGameboard);
+  continueButton.addEventListener('click', reloadGrid);
+  gridSizeSlider.addEventListener('input', (e) => changeSize(e.target.value));
 
   markerType.forEach((elem) => elem.addEventListener('click', (e) => activeMarkerType(e.target)));
 
@@ -47,6 +58,42 @@ const ScreenController = (() => {
     playerXScore.textContent = xScore;
     playerOScore.textContent = oScore;
     tieScore.textContent = tiedMatches;
+  }
+
+  function updateTurnMark(currentMark) {
+    if (currentMark === 'X') {
+      currentMark = 'O';
+    } else if (currentMark === 'O') {
+      currentMark = 'X';
+    }
+
+    turnMark.textContent = currentMark;
+  }
+
+  function updateSizeValue(value) {
+    gridSizeValue.innerHTML = `${value} x ${value}`;
+  }
+
+  function changeSize(value) {
+    currentSize = value;
+    GameBoard.setSize();
+    updateSizeValue(value);
+  }
+
+  function enableGameboard() {
+    gameScreen.classList.remove('disable');
+    gameScreenHeader.classList.remove('disable');
+    gameInitScreen.classList.add('disable');
+    setupGrid(currentSize);
+  }
+
+  function disableGameboard() {
+    gameScreen.classList.add('disable');
+    gameScreenHeader.classList.add('disable');
+    gameInitScreen.classList.remove('disable');
+    clearGrid();
+    GameController.clearGame();
+    updateScore(0, 0, 0);
   }
 
   function showResultModal() {
@@ -57,6 +104,16 @@ const ScreenController = (() => {
   function hideResultModal() {
     resultModal.classList.add('hide');
     overlay.classList.add('hide');
+  }
+
+  function declareWinner() {
+    roundWinner.textContent = `${GameController.getActivePlayer().mark} TAKES THE ROUND`;
+    setTimeout(showResultModal, 200);
+  }
+
+  function declareTie() {
+    roundWinner.textContent = `IT'S A TIE!`;
+    setTimeout(showResultModal, 200);
   }
 
   const updateGameboard = () => {
@@ -78,22 +135,18 @@ const ScreenController = (() => {
       gridCell.dataset.index = cellIndex;
       gameGrid.appendChild(gridCell);
     }
+  }
 
-    function reloadGrid() {
-      clearGrid();
-      setupGrid(currentSize);
-      hideResultModal();
-    }
+  function reloadGrid() {
+    clearGrid();
+    setupGrid(currentSize);
+  }
 
-    function clearGrid() {
-      gameGrid.innerHTML = '';
-      GameBoard.resetCells();
-    }
-
-    return {
-      reloadGrid,
-      clearGrid,
-    };
+  function clearGrid() {
+    gameGrid.innerHTML = '';
+    GameBoard.resetCells();
+    updateTurnMark('O');
+    hideResultModal();
   }
 
   function clickHandlerBoard(e) {
@@ -106,9 +159,8 @@ const ScreenController = (() => {
   }
 
   gameGrid.addEventListener('click', clickHandlerBoard);
-  setupGrid(currentSize);
 
-  return { showResultModal, updateScore };
+  return { showResultModal, updateScore, updateTurnMark, declareWinner, declareTie };
 })();
 
 /* function activeMarkerType(type) {
@@ -137,15 +189,7 @@ function markCell(cell) {
   cell.textContent = currentType;
 }
 
-function updateSizeValue(value) {
-  sizeValue.innerHTML = `${value} x ${value}`;
-}
-
-function changeSize(value) {
-  currentSize = value;
-  updateSizeValue(value);
-  reloadGrid();
-} */
+ */
 
 const GameController = ((playerOneName = 'Player One', playerTwoName = 'Player Two') => {
   let round = 1;
@@ -183,34 +227,47 @@ const GameController = ((playerOneName = 'Player One', playerTwoName = 'Player T
     }
   };
 
+  const resetRoundState = () => {
+    round = 1;
+    activePlayer = players[0];
+  };
+
+  const clearGame = () => {
+    playerXScore = 0;
+    playerOScore = 0;
+    tiedMatches = 0;
+    resetRoundState();
+  };
+
   const playRound = (index) => {
     if (!GameBoard.getCell(index)) {
       GameBoard.setCell(index, getActivePlayer().mark);
-
-      if (checkWinner(index)) {
+      let cells = GameBoard.getBoard();
+      console.log(cells.length);
+      if (checkWinner()) {
         incrementPlayerScore();
-        console.log(playerXScore, playerOScore, tiedMatches);
-        document.getElementById('winner').textContent = getActivePlayer().mark;
+        ScreenController.declareWinner();
         ScreenController.updateScore(playerXScore, playerOScore, tiedMatches);
-        ScreenController.showResultModal();
-        round = 1;
+        resetRoundState();
         return;
-      }
-
-      if (round === 9) {
+      } else if (round === cells.length) {
         tiedMatches++;
+        ScreenController.declareTie();
         ScreenController.updateScore(playerXScore, playerOScore, tiedMatches);
-        ScreenController.showResultModal();
-        round = 1;
+        resetRoundState();
         return;
+      } else {
+        ScreenController.updateTurnMark(getActivePlayer().mark);
+        switchPlayerTurn();
+        round++;
       }
-
-      switchPlayerTurn();
-      round++;
     }
   };
 
   const checkWinner = () => {
+    let boardCells = GameBoard.getBoard();
+    let cells = document.querySelectorAll('.grid-cell');
+
     const winConditions = [
       [0, 1, 2],
       [3, 4, 5],
@@ -222,30 +279,28 @@ const GameController = ((playerOneName = 'Player One', playerTwoName = 'Player T
       [2, 4, 6],
     ];
 
-    if (checkWinXSquare() || checkWinOSquare()) {
-      return 1;
-    }
-
-    function checkWinXSquare() {
-      return winConditions.some((combination) => {
-        return combination.every((i) => {
-          return GameBoard.getCell(i) === 'X';
+    for (let i = 0; i < winConditions.length; i++) {
+      const [a, b, c] = winConditions[i];
+      if (boardCells[a] && boardCells[a] === boardCells[b] && boardCells[a] === boardCells[c]) {
+        cells.forEach((elem) => {
+          if (
+            parseInt(elem.dataset.index) === a ||
+            parseInt(elem.dataset.index) === b ||
+            parseInt(elem.dataset.index) === c
+          ) {
+            elem.style.color = '#86c232';
+            elem.style.backgroundColor = '#2e9cca';
+          }
         });
-      });
+        return boardCells[a];
+      }
     }
-
-    function checkWinOSquare() {
-      console.log(getActivePlayer());
-      return winConditions.some((combination) => {
-        return combination.every((i) => {
-          return GameBoard.getCell(i) === 'O';
-        });
-      });
-    }
+    return null;
   };
 
   return {
     playRound,
     getActivePlayer,
+    clearGame,
   };
 })();

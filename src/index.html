@@ -13,25 +13,28 @@
   </head>
 
   <body>
-    <header class="header">
+    <header class="header disable">
       <div class="container">
-        <h1 class="header-title">Tic Tac Toe</h1>
+        <h2 class="header-turn__display"><p class="turn-mark" id="turnMark">X</p> TURN</h2>
       </div>
     </header>
-
-    <main class="main container">
-      <div class="options">
-        <div class="marker-type">
-          <button class="btn first-type active-type">X</button>
-          <button class="btn second-type">O</button>
+    <section class="game-init">
+      <div class="game-init__options">
+        <h2 class="game-init__heading">Pick game mode and size of gameboard</h2>
+        <div class="game-init__game-mode">
+          <button class="game-init__game-mode__player-vs-player active-type">Player vs Player</button>
+          <button class="game-init__game-mode__player-vs-ai">Player vs AI</button>
         </div>
-        <div class="range-block">
-          <div class="grid-size">3 x 3</div>
-          <input type="range" value="3" min="3" max="6" class="range-slider">
+        <div class="game-init__range-block">
+          <div class="game-init__grid-size">3 x 3</div>
+          <input type="range" value="3" min="3" max="6" class="game-init__range-slider">
         </div>
       </div>
-        <div class="game-grid">
-        </div>
+      <button class="game-init__start-btn">Start game</button>
+    </section>
+
+    <main class="main container disable">
+        <div class="game-grid"></div>
 
         <div class="results">
           <div class="results-block">
@@ -49,15 +52,13 @@
       </div>
 
         <div class="result-modal hide">
-          <div class="result-modal__title">Well played!</div>
-          <h2 class="result-modal__brief"><span id="winner"  class="result-modal__winner"></span> TAKES THE ROUND</h2>
+          <h2 class="result-modal__brief"><span id="winner"  class="result-modal__winner"></span></h2>
           <div class="result-modal__buttons">
-            <button class="result-modal__reset-btn btn">MENU</button>
-            <button class="result-modal__continue-btn btn">NEXT ROUND</button>
+            <button class="result-modal__menu-btn">MENU</button>
+            <button class="result-modal__continue-btn">NEXT ROUND</button>
           </div>
         </div>
 
-        
         <div class="overlay hide"></div>
     </main>
 
