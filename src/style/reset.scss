@@ -8,8 +8,9 @@ body {
   background: $primary;
   display: grid;
   place-items: center;
-  font-family: 'Montserrat';
+  font-family: 'Roboto', sans-serif;
   font-size: 16px;
+  font-weight: 500;
   padding: 0;
   margin: 0;
   overflow-x: hidden;
@@ -45,8 +46,6 @@ select {
   border: none;
   background: none;
   outline: none;
-  font-size: 16px;
-  font-family: 'Montserrat';
 }
 
 button {

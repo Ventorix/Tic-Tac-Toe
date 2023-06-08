@@ -96,6 +96,7 @@
   &__heading {
     font-size: 1.4em;
     line-height: 33px;
+    font-weight: 900;
   }
 
   &__game-mode {
@@ -111,7 +112,7 @@
       padding: 10px 15px;
       border-radius: 12px;
       font-size: 1.25em;
-      font-weight: 700;
+      font-weight: 900;
       color: $white;
       min-width: 100px;
       background-color: lightgrey;
@@ -137,7 +138,7 @@
       padding: 10px 15px;
       border-radius: 12px;
       font-size: 1.25em;
-      font-weight: 700;
+      font-weight: 900;
       color: $white;
       min-width: 100px;
       background-color: $grey;
@@ -199,7 +200,7 @@
   justify-content: center;
   container: card / size;
   font-size: 5cqw;
-  font-weight: 700;
+  font-weight: 900;
   padding: 20px;
   color: $sky;
   border-radius: 6px;

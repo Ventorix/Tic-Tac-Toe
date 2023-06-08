@@ -150,14 +150,13 @@ const ScreenController = (() => {
   }
 
   function clickHandlerBoard(e) {
-    const selectedCell = e.target.dataset.index;
+    const selectedCellIndex = e.target.dataset.index;
+    const cell = e.target;
 
-    if (!selectedCell) return;
+    if (!selectedCellIndex) return;
 
-    let cellColor = GameController.getActivePlayer().color;
-    e.target.style.color = cellColor;
+    GameController.playRound(selectedCellIndex, cell);
 
-    GameController.playRound(selectedCell);
     updateGameboard();
   }
 
@@ -205,12 +204,12 @@ const GameController = ((playerOneName = 'Player One', playerTwoName = 'Player T
     {
       name: playerOneName,
       mark: 'X',
-      color: '#2e9cca',
+      color: 'red',
     },
     {
       name: playerTwoName,
       mark: 'O',
-      color: 'red',
+      color: '#2e9cca',
     },
   ];
 
@@ -244,9 +243,12 @@ const GameController = ((playerOneName = 'Player One', playerTwoName = 'Player T
     resetRoundState();
   };
 
-  const playRound = (index) => {
+  const playRound = (index, currentCell) => {
     if (!GameBoard.getCell(index)) {
       GameBoard.setCell(index, getActivePlayer().mark);
+      let cellColor = GameController.getActivePlayer().color;
+      currentCell.style.color = cellColor;
+
       let cells = GameBoard.getBoard();
 
       if (checkWinner()) {
