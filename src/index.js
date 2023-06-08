@@ -18,12 +18,23 @@ const GameBoard = (() => {
 
   const setCell = (index, mark) => (board[index] = mark);
 
+  const getEmptyCells = () => {
+    let emptyCells = [];
+    for (let i = 0; i < board.length; i++) {
+      let cell = board[i];
+      if (cell == undefined) {
+        emptyCells.push(i);
+      }
+    }
+    return emptyCells;
+  };
+
   const resetCells = () => {
     for (let i = 0; i < board.length; i++) {
-      board[i] = '';
+      board[i] = undefined;
     }
   };
-  return { getBoard, setSize, getCell, setCell, resetCells };
+  return { getBoard, setSize, getCell, setCell, getEmptyCells, resetCells };
 })();
 
 const ScreenController = (() => {
@@ -49,10 +60,27 @@ const ScreenController = (() => {
 
   menuBtn.addEventListener('click', disableGameboard);
   startBtn.addEventListener('click', enableGameboard);
-  continueButton.addEventListener('click', reloadGrid);
+  playerModeButton.addEventListener('click', activePlayerType);
+  aiModeButton.addEventListener('click', activeAIType);
+  continueButton.addEventListener('click', continueGame);
   gridSizeSlider.addEventListener('input', (e) => changeSize(e.target.value));
+  gameGrid.addEventListener('click', clickHandlerBoard);
 
   markerType.forEach((elem) => elem.addEventListener('click', (e) => activeMarkerType(e.target)));
+
+  let gameMode = 1;
+
+  function activePlayerType() {
+    playerModeButton.classList.add('active-type');
+    aiModeButton.classList.remove('active-type');
+    gameMode = 1;
+  }
+
+  function activeAIType() {
+    aiModeButton.classList.add('active-type');
+    playerModeButton.classList.remove('active-type');
+    gameMode = 2;
+  }
 
   function updateScore(xScore, oScore, tiedMatches) {
     playerXScore.textContent = xScore;
@@ -85,6 +113,7 @@ const ScreenController = (() => {
     gameScreenHeader.classList.remove('disable');
     gameInitScreen.classList.add('disable');
     setupGrid(currentSize);
+    GameController.setActiveGameMode(gameMode);
   }
 
   function disableGameboard() {
@@ -124,6 +153,10 @@ const ScreenController = (() => {
     }
   };
 
+  function continueGame() {
+    reloadGrid();
+  }
+
   function setupGrid(size) {
     gameGrid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
     gameGrid.style.gridTemplateRows = `repeat(${size}, 1fr)`;
@@ -154,48 +187,27 @@ const ScreenController = (() => {
     const cell = e.target;
 
     if (!selectedCellIndex) return;
+    let player = GameController.getActivePlayer();
 
-    GameController.playRound(selectedCellIndex, cell);
-
-    updateGameboard();
-  }
-
-  gameGrid.addEventListener('click', clickHandlerBoard);
-
-  return { showResultModal, updateScore, updateTurnMark, declareWinner, declareTie };
-})();
-
-/* function activeMarkerType(type) {
-  if (!type.classList.contains('active-type')) {
-    if (type.classList.contains('first-type')) {
-      activeFirstType();
-    } else {
-      activeSecondType();
+    if (player.mark == 'X') {
+      GameController.playRound(selectedCellIndex, cell);
+      updateGameboard();
     }
   }
-}
 
-function activeFirstType() {
-  currentType = 'X';
-  firstType.classList.add('active-type');
-  secondType.classList.remove('active-type');
-}
-
-function activeSecondType() {
-  currentType = 'O';
-  secondType.classList.add('active-type');
-  firstType.classList.remove('active-type');
-}
-
-function markCell(cell) {
-  cell.textContent = currentType;
-}
-
- */
+  return {
+    updateGameboard,
+    showResultModal,
+    updateScore,
+    updateTurnMark,
+    declareWinner,
+    declareTie,
+  };
+})();
 
 const GameController = ((playerOneName = 'Player One', playerTwoName = 'Player Two') => {
   let round = 1;
-  let gameMode = 1; // 1 - Player vs Player, 2- Player vs BOT
+  let gameMode; // 1 - Player vs Player, 2- Player vs BOT
   let playerXScore = 0,
     playerOScore = 0,
     tiedMatches = 0;
@@ -214,6 +226,17 @@ const GameController = ((playerOneName = 'Player One', playerTwoName = 'Player T
   ];
 
   let activePlayer = players[0];
+
+  function setActiveGameMode(mode) {
+    gameMode = mode;
+    if (gameMode === 2) {
+      players[1].name = 'BOT';
+    }
+  }
+
+  const makeAIMove = () => {
+    minimaxAi.easyBot();
+  };
 
   const switchPlayerTurn = () => {
     activePlayer = activePlayer === players[0] ? players[1] : players[0];
@@ -243,34 +266,66 @@ const GameController = ((playerOneName = 'Player One', playerTwoName = 'Player T
     resetRoundState();
   };
 
+  const gameOverConditions = () => {
+    let cells = GameBoard.getBoard();
+    if (checkWinner()) {
+      incrementPlayerScore();
+      ScreenController.declareWinner();
+      ScreenController.updateScore(playerXScore, playerOScore, tiedMatches);
+      resetRoundState();
+      return true;
+    } else if (round === cells.length) {
+      tiedMatches++;
+      ScreenController.declareTie();
+      ScreenController.updateScore(playerXScore, playerOScore, tiedMatches);
+      resetRoundState();
+      return true;
+    }
+    return;
+  };
+
   const playRound = (index, currentCell) => {
     if (!GameBoard.getCell(index)) {
       GameBoard.setCell(index, getActivePlayer().mark);
       let cellColor = GameController.getActivePlayer().color;
       currentCell.style.color = cellColor;
 
-      let cells = GameBoard.getBoard();
+      if (gameOverConditions()) {
+        return;
+      }
 
-      if (checkWinner()) {
-        incrementPlayerScore();
-        ScreenController.declareWinner();
-        ScreenController.updateScore(playerXScore, playerOScore, tiedMatches);
-        resetRoundState();
-        return;
-      } else if (round === cells.length) {
-        tiedMatches++;
-        ScreenController.declareTie();
-        ScreenController.updateScore(playerXScore, playerOScore, tiedMatches);
-        resetRoundState();
-        return;
-      } else {
+      if (gameMode === 1) {
         ScreenController.updateTurnMark(getActivePlayer().mark);
-        switchPlayerTurn();
         round++;
+        switchPlayerTurn();
+      }
+
+      if (gameMode === 2 && getActivePlayer() == players[0]) {
+        ScreenController.updateTurnMark(getActivePlayer().mark);
+        round++;
+        switchPlayerTurn();
+        playAIRound();
       }
     }
   };
 
+  function playAIRound() {
+    if (gameOverConditions()) {
+      return;
+    }
+
+    if (gameMode === 2 && getActivePlayer() == players[1]) {
+      setTimeout(() => {
+        makeAIMove();
+        if (gameOverConditions()) {
+          return;
+        }
+        ScreenController.updateTurnMark(getActivePlayer().mark);
+        switchPlayerTurn();
+        round++;
+      }, 600);
+    }
+  }
   const checkWinner = () => {
     let boardCells = GameBoard.getBoard();
     let cells = document.querySelectorAll('.grid-cell');
@@ -470,9 +525,34 @@ const GameController = ((playerOneName = 'Player One', playerTwoName = 'Player T
     return null;
   };
 
+  // AI
+
+  const minimaxAi = (() => {
+    function getBestMove(currentBoard) {
+      let bestVal = +Infinity;
+      let bestMove = [-1, -1];
+    }
+
+    const getRandomMove = () => {
+      let avaibleMoves = GameBoard.getEmptyCells();
+      let randomMove = avaibleMoves[Math.floor(Math.random() * avaibleMoves.length)];
+      return randomMove;
+    };
+
+    const easyBot = () => {
+      let randomMove = getRandomMove();
+
+      GameBoard.setCell(randomMove, 'O');
+      ScreenController.updateGameboard();
+    };
+
+    return { getBestMove, getRandomMove, easyBot };
+  })();
+
   return {
     playRound,
     getActivePlayer,
     clearGame,
+    setActiveGameMode,
   };
 })();

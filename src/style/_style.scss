@@ -81,8 +81,8 @@
   &__options {
     background: $secondary;
     padding: 15px;
-    height: 250px;
-    width: 90%;
+    height: 270px;
+    width: 100%;
     border-radius: 10px;
     box-shadow: 0 10px 10px rgba(0, 0, 0, 0.5);
     display: grid;
@@ -94,7 +94,7 @@
   }
 
   &__heading {
-    font-size: 1.4em;
+    font-size: 1.6em;
     line-height: 33px;
     font-weight: 900;
   }
@@ -105,17 +105,17 @@
     height: 80%;
     grid-template-columns: 1fr 1fr;
     border-radius: 18px;
-    gap: 5px;
+    gap: 12px;
     position: relative;
 
     &__player-vs-player {
-      padding: 10px 15px;
+      padding: 20px 15px;
       border-radius: 12px;
-      font-size: 1.25em;
+      font-size: 1.3em;
       font-weight: 900;
       color: $white;
       min-width: 100px;
-      background-color: lightgrey;
+      background-color: $grey;
       transition: background-color 0.25s;
       border: 1px $white solid;
 
@@ -135,9 +135,9 @@
     }
 
     &__player-vs-ai {
-      padding: 10px 15px;
+      padding: 20px 15px;
       border-radius: 12px;
-      font-size: 1.25em;
+      font-size: 1.3em;
       font-weight: 900;
       color: $white;
       min-width: 100px;
