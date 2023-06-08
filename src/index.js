@@ -154,6 +154,9 @@ const ScreenController = (() => {
 
     if (!selectedCell) return;
 
+    let cellColor = GameController.getActivePlayer().color;
+    e.target.style.color = cellColor;
+
     GameController.playRound(selectedCell);
     updateGameboard();
   }
@@ -202,10 +205,12 @@ const GameController = ((playerOneName = 'Player One', playerTwoName = 'Player T
     {
       name: playerOneName,
       mark: 'X',
+      color: '#2e9cca',
     },
     {
       name: playerTwoName,
       mark: 'O',
+      color: 'red',
     },
   ];
 
