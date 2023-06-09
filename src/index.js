@@ -2,10 +2,8 @@ import './index.html';
 import './index.scss';
 
 const DEFAULT_SIZE = 3;
-const DEFAULT_TYPE = 'X';
 
 let currentSize = DEFAULT_SIZE;
-let currentType = DEFAULT_TYPE;
 
 const GameBoard = (() => {
   let board = new Array(currentSize ** 2);
@@ -189,7 +187,12 @@ const ScreenController = (() => {
     if (!selectedCellIndex) return;
     let player = GameController.getActivePlayer();
 
-    if (player.mark == 'X') {
+    if (gameMode === 1) {
+      GameController.playRound(selectedCellIndex, cell);
+      updateGameboard();
+    }
+
+    if (player.mark == 'X' && gameMode === 2) {
       GameController.playRound(selectedCellIndex, cell);
       updateGameboard();
     }
@@ -234,10 +237,6 @@ const GameController = ((playerOneName = 'Player One', playerTwoName = 'Player T
     }
   }
 
-  const makeAIMove = () => {
-    minimaxAi.easyBot();
-  };
-
   const switchPlayerTurn = () => {
     activePlayer = activePlayer === players[0] ? players[1] : players[0];
   };
@@ -276,6 +275,8 @@ const GameController = ((playerOneName = 'Player One', playerTwoName = 'Player T
       return true;
     } else if (round === cells.length) {
       tiedMatches++;
+      console.log(cells.length);
+      console.log(round);
       ScreenController.declareTie();
       ScreenController.updateScore(playerXScore, playerOScore, tiedMatches);
       resetRoundState();
@@ -309,11 +310,11 @@ const GameController = ((playerOneName = 'Player One', playerTwoName = 'Player T
     }
   };
 
-  function playAIRound() {
-    if (gameOverConditions()) {
-      return;
-    }
+  const makeAIMove = () => {
+    minimaxAi.easyBot();
+  };
 
+  function playAIRound() {
     if (gameMode === 2 && getActivePlayer() == players[1]) {
       setTimeout(() => {
         makeAIMove();
@@ -323,7 +324,7 @@ const GameController = ((playerOneName = 'Player One', playerTwoName = 'Player T
         ScreenController.updateTurnMark(getActivePlayer().mark);
         switchPlayerTurn();
         round++;
-      }, 600);
+      }, 500);
     }
   }
   const checkWinner = () => {
@@ -542,7 +543,7 @@ const GameController = ((playerOneName = 'Player One', playerTwoName = 'Player T
     const easyBot = () => {
       let randomMove = getRandomMove();
 
-      GameBoard.setCell(randomMove, 'O');
+      GameBoard.setCell(randomMove, activePlayer.mark);
       ScreenController.updateGameboard();
     };
 
