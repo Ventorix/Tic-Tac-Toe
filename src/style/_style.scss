@@ -29,7 +29,7 @@
 }
 
 .game-init {
-  height: 100vh;
+  height: 90vh;
   width: 35em;
   display: grid;
   align-content: center;
@@ -189,8 +189,8 @@
   margin-top: 40px;
   display: grid;
   gap: 10px;
-  width: 600px;
-  height: 600px;
+  width: 30rem;
+  height: 30rem;
   margin: 0 auto;
 }
 
@@ -242,7 +242,7 @@
     background-color: rgba(255, 255, 255, 0.1);
 
     &__name {
-      font-size: 1.3em;
+      font-size: 1.25em;
       font-weight: 700;
       line-height: 15px;
     }
@@ -361,7 +361,7 @@
 }
 
 .disable {
-  display: none;
+  display: none !important;
 }
 
 /* FOOTER */
@@ -402,7 +402,104 @@
 }
 
 /* MEDIA QUERIES */
+@media (max-width: 800px) {
+}
 
+@media (max-width: 600px) {
+  .header {
+    margin-bottom: 0;
+  }
+
+  .game-init__game-mode {
+    grid-template-columns: none;
+    grid-template-rows: 1fr 1fr;
+  }
+
+  .results-block__name {
+    font-size: 0.9em;
+    line-height: 15px;
+  }
+
+  .game-grid {
+    margin-top: 40px;
+    gap: 10px;
+    width: 25rem;
+    height: 25rem;
+  }
+
+  .game-init {
+    width: 25em;
+    padding: 15px;
+
+    &__options {
+      width: 100%;
+    }
+  }
+  .game-init__game-mode__player-vs-player {
+    font-size: 1.1em;
+    padding: 5px;
+  }
+
+  .game-init__game-mode__player-vs-ai {
+    font-size: 1.1em;
+    padding: 5px;
+  }
+}
+
+@media (max-width: 450px) {
+  .header-turn__display {
+    padding: 0;
+  }
+
+  .result-modal__buttons {
+    width: 100%;
+  }
+
+  .results-block {
+    padding: 5px 0px;
+  }
+
+  .results-block__score {
+    font-size: 1.2em;
+  }
+
+  .game-grid {
+    gap: 10px;
+    width: 75vw;
+    height: 75vw;
+  }
+
+  .game-init__game-mode__player-vs-player {
+    font-size: 1.1em;
+    padding: 5px;
+  }
+
+  .game-init__game-mode__player-vs-ai {
+    font-size: 1.1em;
+    padding: 5px;
+  }
+}
+
+@media (max-width: 400px) {
+  .game-init {
+    width: 18em;
+    padding: 15px;
+
+    &__heading {
+      font-size: 1.1em;
+    }
+
+    &__game-mode__player-vs-player {
+      font-size: 1em;
+      padding: 2px;
+    }
+
+    &__game-mode__player-vs-ai {
+      font-size: 1em;
+      padding: 2px;
+    }
+  }
+}
 /* ANIMATIONS */
 
 @keyframes blinking {

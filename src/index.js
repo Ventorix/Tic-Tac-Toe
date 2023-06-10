@@ -43,6 +43,7 @@ const ScreenController = (() => {
   const gridSizeSlider = document.querySelector('.game-init__range-slider');
   const gameGrid = document.querySelector('.game-grid');
   const overlay = document.querySelector('.overlay');
+  const footer = document.querySelector('footer');
   const resultModal = document.querySelector('.result-modal');
   const continueButton = document.querySelector('.result-modal__continue-btn');
   const playerXScore = document.getElementById('xScore');
@@ -110,6 +111,7 @@ const ScreenController = (() => {
     gameScreen.classList.remove('disable');
     gameScreenHeader.classList.remove('disable');
     gameInitScreen.classList.add('disable');
+    footer.classList.remove('disable');
     setupGrid(currentSize);
     GameController.setActiveGameMode(gameMode);
   }
@@ -117,6 +119,7 @@ const ScreenController = (() => {
   function disableGameboard() {
     gameScreen.classList.add('disable');
     gameScreenHeader.classList.add('disable');
+    footer.classList.add('disable');
     gameInitScreen.classList.remove('disable');
     clearGrid();
     GameController.clearGame();
