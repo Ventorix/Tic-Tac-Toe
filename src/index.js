@@ -232,9 +232,6 @@ const GameController = ((playerOneName = 'Player One', playerTwoName = 'Player T
 
   function setActiveGameMode(mode) {
     gameMode = mode;
-    if (gameMode === 2) {
-      players[1].name = 'BOT';
-    }
   }
 
   const switchPlayerTurn = () => {
@@ -311,7 +308,7 @@ const GameController = ((playerOneName = 'Player One', playerTwoName = 'Player T
   };
 
   const makeAIMove = () => {
-    minimaxAi.easyBot();
+    AI.easyBot();
   };
 
   function playAIRound() {
@@ -528,12 +525,7 @@ const GameController = ((playerOneName = 'Player One', playerTwoName = 'Player T
 
   // AI
 
-  const minimaxAi = (() => {
-    function getBestMove(currentBoard) {
-      let bestVal = +Infinity;
-      let bestMove = [-1, -1];
-    }
-
+  const AI = (() => {
     const getRandomMove = () => {
       let avaibleMoves = GameBoard.getEmptyCells();
       let randomMove = avaibleMoves[Math.floor(Math.random() * avaibleMoves.length)];
@@ -547,7 +539,7 @@ const GameController = ((playerOneName = 'Player One', playerTwoName = 'Player T
       ScreenController.updateGameboard();
     };
 
-    return { getBestMove, getRandomMove, easyBot };
+    return { getRandomMove, easyBot };
   })();
 
   return {
